@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SafeLine – FieldLab 2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { background: #eef2f7; font-family: "Inter", sans-serif; }
+        .navbar-brand { font-weight: 700; }
+        .role-badge { font-size: 0.85rem; }
+        .card { border-radius: 14px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+        .section-title {
+            font-weight: 600; font-size: 1.15rem;
+            border-bottom: 2px solid #e1e5ea; padding-bottom: 6px;
+            margin-bottom: 18px;
+        }
+        .form-control, .form-select { border-radius: 10px; }
+
+        /* Dark mode */
+        body.dark {
+            background: #111827;
+            color: #e5e7eb;
+        }
+        body.dark .card { background: #1f2933; color: #e5e7eb; }
+        body.dark .navbar { background: #020617 !important; }
+        body.dark .alert-info { background:#0b3b5b; color:#dbeafe; border-color:#0b3b5b; }
+
+        .success-popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: none;
+            min-width: 320px;
+        }
+
+        .form-step { display: none; }
+        .form-step.active { display: block; }
+        .stepper { display: flex; gap: 12px; margin-bottom: 16px; }
+        .stepper .step { flex: 1; text-align: center; }
+        .step-circle {
+            width: 36px; height: 36px; border-radius: 50%;
+            margin: 0 auto 6px auto;
+            display: grid; place-items: center;
+            background: #e5e7eb; color: #111827; font-weight: 700;
+        }
+        .step.active .step-circle { background: #0d6efd; color: #fff; }
+        .step.done .step-circle { background: #16a34a; color: #fff; }
+        .step-label { font-size: 0.95rem; font-weight: 600; color: #4b5563; }
+        .step.active .step-label { color: #0d6efd; }
+        .step-navigation { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+<!-- Success popup -->
+<div id="successPopup" class="alert alert-success text-center success-popup">
+    Report submitted. Case ID: <span id="successCaseId"></span>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <span class="navbar-brand" id="title-app">SafeLine</span>
+
+        <div class="d-flex ms-auto align-items-center gap-3">
+            <span class="badge bg-secondary role-badge">
+                Role: {{ role|capitalize if role else "Unknown" }}
+            </span>
+
+            <!-- Language -->
+            <select id="langSelect" class="form-select form-select-sm" style="width: 120px;">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="ar">العربية</option>
+            </select>
+
+            <!-- Dark mode -->
+            <button id="darkToggle" class="btn btn-outline-light btn-sm">Dark</button>
+
+            <!-- Logout -->
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <div class="alert alert-info shadow-sm">
+        <strong id="warning-title">Important:</strong>
+        <span id="warning-text">
+            Do NOT enter names, exact GPS, phone numbers or any identifiable survivor information.
+        </span>
+    </div>
+
+    <form id="reportForm" action="{{ url_for('submit') }}" method="POST">
+
+        <div class="stepper" id="stepper">
+            <div class="step active" data-step="0">
+                <div class="step-circle">1</div>
+                <div class="step-label">Organization</div>
+            </div>
+            <div class="step" data-step="1">
+                <div class="step-circle">2</div>
+                <div class="step-label">Location</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">3</div>
+                <div class="step-label">Incident</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">4</div>
+                <div class="step-label">Victim &amp; Perp</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-circle">5</div>
+                    <div class="step-label">Publication</div>
+            </div>
+                <div class="step" data-step="5">
+                    <div class="step-circle">6</div>
+                    <div class="step-label">Review</div>
+                </div>
+        </div>
+
+        <!-- STEP 1: ORGANIZATION -->
+        <div class="form-step active" data-step="0">
+            <div class="card p-4 mb-2">
+                <div class="section-title" id="org-section-title">Organization Information</div>
+
+                <label class="form-label">Organization ID *</label>
+                <input type="text" class="form-control" name="org_id" required>
+
+                <label class="form-label mt-3">Input By *</label>
+                <input type="text" class="form-control" name="input_by" required>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Date Received *</label>
+                        <input type="date" class="form-control" name="date_received" required>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <label class="form-label">Date Recorded *</label>
+                        <input type="date" class="form-control" name="date_recorded" required>
+                    </div>
+                </div>
+            </div>
+            <div class="step-navigation justify-content-end">
+                <button type="button" class="btn btn-primary next-step">Continue</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: LOCATION -->
+        <div class="form-step" data-step="1">
+            <div class="card p-4 mb-2">
+                <div class="section-title" id="loc-section-title">Location Details</div>
+
+                <label class="form-label">Country *</label>
+                <input type="text" class="form-control" name="country" required>
+
+                <label class="form-label mt-3">State / Province</label>
+                <input type="text" class="form-control" name="state">
+
+                <label class="form-label mt-3">Town / City</label>
+                <input type="text" class="form-control" name="town">
+
+                <label class="form-label mt-3">Village</label>
+                <input type="text" class="form-control" name="village">
+
+                <label class="form-label mt-3">Camp (if applicable)</label>
+                <input type="text" class="form-control" name="camp">
+            </div>
+            <div class="step-navigation">
+                <button type="button" class="btn btn-outline-secondary prev-step">Back</button>
+                <button type="button" class="btn btn-primary next-step">Continue</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: INCIDENT -->
+        <div class="form-step" data-step="2">
+            <div class="card p-4 mb-2">
+                <div class="section-title" id="incident-section-title">Incident Details</div>
+
+                <label class="form-label">Incident Date *</label>
+                <input type="date" class="form-control" name="incident_date" required>
+
+                <label class="form-label mt-3">Type of Violence *</label>
+                <select class="form-select" name="violence_type" required>
+                    <option value="">Select Type</option>
+                    <option>Rape</option>
+                    <option>Sexual Assault</option>
+                    <option>Harassment</option>
+                    <option>Other</option>
+                </select>
+
+                <label class="form-label mt-3">Short Description *</label>
+                <textarea class="form-control" name="short_desc" rows="2" required></textarea>
+
+                <label class="form-label mt-3">Number of Victims *</label>
+                <input type="number" min="1" class="form-control" name="num_victims" required>
+            </div>
+            <div class="step-navigation">
+                <button type="button" class="btn btn-outline-secondary prev-step">Back</button>
+                <button type="button" class="btn btn-primary next-step">Continue</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: VICTIM & PERPETRATOR -->
+        <div class="form-step" data-step="3">
+            <div class="card p-4 mb-3">
+                <div class="section-title" id="victim-section-title">Victim Details</div>
+
+                <label class="form-label">Victim Age Group *</label>
+                <select class="form-select" name="victim_age" required>
+                    <option value="">Select Age Group</option>
+                    <option>Under 18</option>
+                    <option>18-25</option>
+                    <option>26-40</option>
+                    <option>40+</option>
+                </select>
+
+                <label class="form-label mt-3">Victim Gender *</label>
+                <select class="form-select" name="victim_gender" required>
+                    <option value="">Select Gender</option>
+                    <option>Female</option>
+                    <option>Male</option>
+                    <option>Other</option>
+                    <option>Unknown</option>
+                </select>
+            </div>
+
+            <div class="card p-4 mb-2">
+                <div class="section-title" id="perp-section-title">Perpetrator Details</div>
+
+                <label class="form-label">Number of Perpetrators *</label>
+                <input type="number" min="1" class="form-control" name="num_perpetrators" required>
+
+                <label class="form-label mt-3">Affiliation (if known)</label>
+                <input type="text" class="form-control" name="perp_affiliation">
+            </div>
+
+            <div class="step-navigation">
+                <button type="button" class="btn btn-outline-secondary prev-step">Back</button>
+                <button type="button" class="btn btn-primary next-step">Continue</button>
+            </div>
+        </div>
+
+        <!-- STEP 5: PUBLICATION -->
+        <div class="form-step" data-step="4">
+            <div class="card p-4 mb-3">
+                <div class="section-title" id="pub-section-title">Publication / Source</div>
+
+                <label class="form-label">Publication Type *</label>
+                <select class="form-select" name="pub_type" required>
+                    <option value="">Select Type</option>
+                    <option>Internal Report</option>
+                    <option>External Organization Report</option>
+                    <option>News Article</option>
+                    <option>Medical Record</option>
+                </select>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Publication Date *</label>
+                        <input type="date" class="form-control" name="pub_date" required>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <label class="form-label">Link / Reference *</label>
+                        <input type="text" class="form-control" name="pub_link" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-navigation align-items-center">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary prev-step">Back</button>
+                    <button type="reset" class="btn btn-light">Clear</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary next-step">Continue to Review</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 6: REVIEW & SUBMIT -->
+        <div class="form-step" data-step="5">
+            <div class="card p-4 mb-3">
+                <div class="section-title">Review Your Inputs</div>
+                <div id="reviewSummary" class="row g-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <div class="step-navigation align-items-center">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary prev-step">Back</button>
+                    <button type="reset" class="btn btn-light">Clear</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button id="submitBtn" type="submit" class="btn btn-success">
+                        <span id="submitText">Submit Report</span>
+                        <span id="submitSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                    <button id="convertUploadReporter" type="button" class="btn btn-primary">
+                        Convert &amp; Upload to Fuseki
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer class="text-center text-muted pb-3">
+    FieldLab 2 – SafeLine Prototype · v0.9 · For educational use only
+</footer>
+
+<script>
+    const form = document.getElementById("reportForm");
+
+    // ----------------- Dark mode -----------------
+    const body = document.body;
+    const darkToggle = document.getElementById("darkToggle");
+    if (localStorage.getItem("darkMode") === "on") {
+        body.classList.add("dark");
+    }
+    darkToggle.addEventListener("click", () => {
+        body.classList.toggle("dark");
+        localStorage.setItem("darkMode", body.classList.contains("dark") ? "on" : "off");
+    });
+
+    // ----------------- Multi-step form -----------------
+    const stepElements = Array.from(document.querySelectorAll(".form-step"));
+    const stepperElements = Array.from(document.querySelectorAll(".stepper .step"));
+    const REVIEW_STEP = stepElements.length - 1;
+    let currentStep = 0;
+    let lastInvalidField = null;
+
+    const reviewSummary = document.getElementById("reviewSummary");
+
+    const reviewFields = [
+        { label: "Organization ID", name: "org_id" },
+        { label: "Input By", name: "input_by" },
+        { label: "Date Received", name: "date_received" },
+        { label: "Date Recorded", name: "date_recorded" },
+        { label: "Country", name: "country" },
+        { label: "State / Province", name: "state" },
+        { label: "Town / City", name: "town" },
+        { label: "Village", name: "village" },
+        { label: "Camp", name: "camp" },
+        { label: "Incident Date", name: "incident_date" },
+        { label: "Type of Violence", name: "violence_type" },
+        { label: "Short Description", name: "short_desc" },
+        { label: "Number of Victims", name: "num_victims" },
+        { label: "Victim Age Group", name: "victim_age" },
+        { label: "Victim Gender", name: "victim_gender" },
+        { label: "Number of Perpetrators", name: "num_perpetrators" },
+        { label: "Perpetrator Affiliation", name: "perp_affiliation" },
+        { label: "Publication Type", name: "pub_type" },
+        { label: "Publication Date", name: "pub_date" },
+        { label: "Link / Reference", name: "pub_link" }
+    ];
+
+    function getValue(name) {
+        const field = form.elements[name];
+        if (!field) return "";
+        return field.value?.trim() || "";
+    }
+
+    function fillReviewSummary() {
+        if (!reviewSummary) return;
+        const html = reviewFields.map(({ label, name }) => {
+            const val = getValue(name) || "—";
+            return `
+                <div class="col-md-6">
+                    <div class="p-3 bg-light border rounded-3 h-100">
+                        <div class="fw-semibold text-secondary">${label}</div>
+                        <div>${val.replace(/</g, "&lt;")}</div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+        reviewSummary.innerHTML = html;
+    }
+
+    function showStep(index) {
+        currentStep = index;
+        stepElements.forEach((el, idx) => {
+            el.classList.toggle("active", idx === index);
+        });
+        stepperElements.forEach((el, idx) => {
+            el.classList.toggle("active", idx === index);
+            el.classList.toggle("done", idx < index);
+        });
+        if (index === REVIEW_STEP) {
+            fillReviewSummary();
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function validateStep(index) {
+        const step = stepElements[index];
+        if (!step) return true;
+        const requiredFields = step.querySelectorAll("[required]");
+        for (const field of requiredFields) {
+            if (!field.value) {
+                lastInvalidField = field;
+                field.reportValidity();
+                return false;
+            }
+            if (!field.checkValidity()) {
+                lastInvalidField = field;
+                field.reportValidity();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function focusInvalidField() {
+        if (lastInvalidField) {
+            lastInvalidField.focus();
+            lastInvalidField.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }
+
+    function validateAllSteps() {
+        for (let i = 0; i < stepElements.length; i++) {
+            if (!validateStep(i)) {
+                showStep(i);
+                focusInvalidField();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    document.querySelectorAll(".next-step").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            if (!validateStep(currentStep)) {
+                focusInvalidField();
+                return;
+            }
+            const next = Math.min(currentStep + 1, stepElements.length - 1);
+            showStep(next);
+        });
+    });
+
+    document.querySelectorAll(".prev-step").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const prev = Math.max(currentStep - 1, 0);
+            showStep(prev);
+        });
+    });
+
+    // Allow clicking stepper to navigate freely between sections
+    stepperElements.forEach((el, idx) => {
+        el.style.cursor = "pointer";
+        el.addEventListener("click", () => {
+            if (idx === currentStep) return;
+            showStep(idx);
+        });
+    });
+
+    form.addEventListener("reset", () => showStep(0));
+    showStep(0);
+
+    // ----------------- Multi-language (basic labels) -----------------
+    const translations = {
+        en: {
+            title: "SafeLine",
+            warningTitle: "Important:",
+            warningText: "Do NOT enter names, exact GPS, phone numbers or any identifiable survivor information.",
+            submit: "Submit Report"
+        },
+        fr: {
+            title: "SafeLine",
+            warningTitle: "Important :",
+            warningText: "N’entrez PAS de noms, de coordonnées GPS exactes, de numéros de téléphone ou d’informations identifiables.",
+            submit: "Envoyer le rapport"
+        },
+        ar: {
+            title: "سيف لاين",
+            warningTitle: "مهم:",
+            warningText: "يُرجى عدم إدخال الأسماء أو إحداثيات GPS الدقيقة أو أرقام الهواتف أو أي معلومات تعريفية.",
+            submit: "إرسال التقرير"
+        }
+    };
+
+    const langSelect = document.getElementById("langSelect");
+    const titleApp = document.getElementById("title-app");
+    const warningTitle = document.getElementById("warning-title");
+    const warningText = document.getElementById("warning-text");
+    const submitText = document.getElementById("submitText");
+
+    function applyLang(lang) {
+        const t = translations[lang] || translations.en;
+        titleApp.textContent = t.title;
+        warningTitle.textContent = t.warningTitle;
+        warningText.textContent = t.warningText;
+        submitText.textContent = t.submit;
+        localStorage.setItem("lang", lang);
+    }
+
+    const savedLang = localStorage.getItem("lang") || "en";
+    langSelect.value = savedLang;
+    applyLang(savedLang);
+
+    langSelect.addEventListener("change", () => applyLang(langSelect.value));
+
+    // ----------------- Success popup from query params -----------------
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "1") {
+        const popup = document.getElementById("successPopup");
+        const caseIdSpan = document.getElementById("successCaseId");
+        caseIdSpan.textContent = params.get("case_id") || "";
+        popup.style.display = "block";
+
+        setTimeout(() => {
+            popup.style.display = "none";
+            window.history.replaceState({}, "", "/report"); // clean URL
+            form.reset();
+            showStep(0);
+        }, 3000);
+    }
+
+    // ----------------- Logical validation before submit -----------------
+    const submitBtn = document.getElementById("submitBtn");
+    const submitSpinner = document.getElementById("submitSpinner");
+
+    form.addEventListener("submit", function (e) {
+        if (!validateAllSteps()) {
+            e.preventDefault();
+            return;
+        }
+
+        const today = new Date();
+        const incDate = new Date(form.incident_date.value);
+        const recDate = new Date(form.date_recorded.value);
+        const recvDate = new Date(form.date_received.value);
+        const pubDate = new Date(form.pub_date.value);
+
+        // Incident date cannot be in the future
+        if (incDate > today) {
+            alert("Incident date cannot be in the future.");
+            e.preventDefault();
+            return;
+        }
+
+        // Recorded date >= received date >= incident date
+        if (recvDate < incDate) {
+            alert("Date received cannot be earlier than incident date.");
+            e.preventDefault();
+            return;
+        }
+        if (recDate < recvDate) {
+            alert("Date recorded cannot be earlier than date received.");
+            e.preventDefault();
+            return;
+        }
+
+        // Publication date cannot be before incident date or in the future
+        if (pubDate < incDate) {
+            alert("Publication date cannot be before the incident date.");
+            e.preventDefault();
+            return;
+        }
+        if (pubDate > today) {
+            alert("Publication date cannot be in the future.");
+            e.preventDefault();
+            return;
+        }
+
+        // Simple numeric checks
+        if (parseInt(form.num_victims.value || "0") < 1) {
+            alert("Number of victims must be at least 1.");
+            e.preventDefault();
+            return;
+        }
+        if (parseInt(form.num_perpetrators.value || "0") < 1) {
+            alert("Number of perpetrators must be at least 1.");
+            e.preventDefault();
+            return;
+        }
+
+        // Show loading spinner
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove("d-none");
+    });
+
+    // ----------------- Convert & Upload button (reporter) -----------------
+    const convertBtn = document.getElementById('convertUploadReporter');
+    if (convertBtn) {
+        convertBtn.addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Uploading to Fuseki...';
+
+            fetch('{{ url_for("convert_and_upload") }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(async (resp) => {
+                let data;
+                try {
+                    data = await resp.json();
+                } catch (e) {
+                    data = {success: false, message: 'Invalid response from server'};
+                }
+                if (data.success) {
+                    alert('Convert & upload succeeded: ' + data.message);
+                } else {
+                    alert('Convert & upload failed: ' + (data.message || 'Unknown error'));
+                }
+            }).catch((err) => {
+                alert('Convert & upload request failed: ' + err);
+            }).finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Convert & Upload to Fuseki';
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
