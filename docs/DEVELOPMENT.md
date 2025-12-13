@@ -20,13 +20,15 @@ SafeLine consists of three main components:
 ## Project Structure
 
 ```
-safeline-app/
 ├── app.py                      # Flask application and routes
 ├── csv_reports_to_rdf.py       # CSV to RDF conversion
 ├── requirements.txt            # Python dependencies
 ├── docker-compose.yml          # Fuseki container configuration
 ├── Dockerfile                  # Fuseki image configuration
 ├── docker-entrypoint.sh        # Fuseki startup script
+├── sord_ontology.ttl           # SORD ontology definition
+├── sord_to_cdm_mapper.ttl      # SORD to Common Data Model mappings
+├── sample_queries.sparql       # Example SPARQL queries
 ├── .gitignore                  # Git ignore rules
 ├── templates/                  # HTML templates
 │   ├── login.html
@@ -68,6 +70,26 @@ Converts CSV rows to RDF triples using SORD ontology:
 - Creates RDF graph with Turtle serialization
 - Maps CSV fields to SORD properties
 - Handles data type conversion (dates, integers)
+
+### Ontology Files
+
+**sord_ontology.ttl** - SORD (Sudan Organized Rape Data Ontology)
+- Defines classes for sexual violence incidents
+- Specifies properties for victim, perpetrator, and location information
+- Uses standard ontologies: RDF, RDFS, OWL, Dublin Core, SKOS
+
+**sord_to_cdm_mapper.ttl** - Common Data Model Mapping
+- Maps SORD properties to Common Data Model classes
+- Enables interoperability with other humanitarian data systems
+- Documents property alignments and transformations
+
+**sample_queries.sparql** - Example SPARQL Queries
+- Query incidents by violence type
+- Query incidents by location
+- Query victims by gender and count
+- Query perpetrators by affiliation
+- Timeline queries for incident trends
+- Retrieve complete incident records with all details
 
 ### Data Flow
 

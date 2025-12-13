@@ -1,0 +1,199 @@
+@prefix sord: <http://fieldlab2.org/ontology/sord#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# ========================================
+# Ontology Metadata
+# ========================================
+<http://fieldlab2.org/ontology/sord> a owl:Ontology ;
+    rdfs:label "SORD - Sudan Organized Rape Data Ontology"@en ;
+    rdfs:comment "Ontology for documenting sexual violence incidents in Sudan and refugee contexts"@en ;
+    dcterms:created "2025-12-02"^^xsd:date ;
+    dcterms:creator "FieldLab 2 Team" ;
+    owl:versionInfo "1.0" .
+
+# ========================================
+# Classes
+# ========================================
+
+sord:SexualViolenceIncident a owl:Class ;
+    rdfs:label "Sexual Violence Incident"@en ;
+    rdfs:comment "An incident of sexual violence"@en .
+
+sord:Location a owl:Class ;
+    rdfs:label "Location"@en ;
+    rdfs:comment "Geographic location where incident occurred"@en .
+
+sord:Victim a owl:Class ;
+    rdfs:label "Victim"@en ;
+    rdfs:comment "Person(s) who experienced sexual violence"@en .
+
+sord:Perpetrator a owl:Class ;
+    rdfs:label "Perpetrator"@en ;
+    rdfs:comment "Person(s) who committed sexual violence"@en .
+
+sord:Publication a owl:Class ;
+    rdfs:label "Publication"@en ;
+    rdfs:comment "Source document reporting the incident"@en .
+
+# ========================================
+# Object Properties
+# ========================================
+
+sord:hasLocation a owl:ObjectProperty ;
+    rdfs:label "has location"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range sord:Location .
+
+sord:hasVictim a owl:ObjectProperty ;
+    rdfs:label "has victim"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range sord:Victim .
+
+sord:hasPerpetrator a owl:ObjectProperty ;
+    rdfs:label "has perpetrator"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range sord:Perpetrator .
+
+sord:hasPublication a owl:ObjectProperty ;
+    rdfs:label "has publication"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range sord:Publication .
+
+# ========================================
+# Datatype Properties - Incident
+# ========================================
+
+sord:recordId a owl:DatatypeProperty ;
+    rdfs:label "record ID"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:recordedDate a owl:DatatypeProperty ;
+    rdfs:label "recorded date"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:date .
+
+sord:incidentDate a owl:DatatypeProperty ;
+    rdfs:label "incident date"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:incidentType a owl:DatatypeProperty ;
+    rdfs:label "incident type"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:violencePerpetrated a owl:DatatypeProperty ;
+    rdfs:label "violence perpetrated"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:duration a owl:DatatypeProperty ;
+    rdfs:label "duration"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:medicalImpact a owl:DatatypeProperty ;
+    rdfs:label "medical impact"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:socialImpact a owl:DatatypeProperty ;
+    rdfs:label "social impact"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+sord:mentalHealthImpact a owl:DatatypeProperty ;
+    rdfs:label "mental health impact"@en ;
+    rdfs:domain sord:SexualViolenceIncident ;
+    rdfs:range xsd:string .
+
+# ========================================
+# Datatype Properties - Location
+# ========================================
+
+sord:locationName a owl:DatatypeProperty ;
+    rdfs:label "location name"@en ;
+    rdfs:domain sord:Location ;
+    rdfs:range xsd:string .
+
+sord:camp a owl:DatatypeProperty ;
+    rdfs:label "camp"@en ;
+    rdfs:domain sord:Location ;
+    rdfs:range xsd:string .
+
+# ========================================
+# Datatype Properties - Victim
+# ========================================
+
+sord:numberOfVictims a owl:DatatypeProperty ;
+    rdfs:label "number of victims"@en ;
+    rdfs:domain sord:Victim ;
+    rdfs:range xsd:integer .
+
+sord:age a owl:DatatypeProperty ;
+    rdfs:label "age"@en ;
+    rdfs:range xsd:integer .
+
+sord:gender a owl:DatatypeProperty ;
+    rdfs:label "gender"@en ;
+    rdfs:range xsd:string .
+
+sord:ethnicity a owl:DatatypeProperty ;
+    rdfs:label "ethnicity"@en ;
+    rdfs:domain sord:Victim ;
+    rdfs:range xsd:string .
+
+sord:maritalStatus a owl:DatatypeProperty ;
+    rdfs:label "marital status"@en ;
+    rdfs:domain sord:Victim ;
+    rdfs:range xsd:string .
+
+sord:parentalStatus a owl:DatatypeProperty ;
+    rdfs:label "parental status"@en ;
+    rdfs:domain sord:Victim ;
+    rdfs:range xsd:string .
+
+# ========================================
+# Datatype Properties - Perpetrator
+# ========================================
+
+sord:numberOfPerpetrators a owl:DatatypeProperty ;
+    rdfs:label "number of perpetrators"@en ;
+    rdfs:domain sord:Perpetrator ;
+    rdfs:range xsd:integer .
+
+sord:affiliation a owl:DatatypeProperty ;
+    rdfs:label "affiliation"@en ;
+    rdfs:domain sord:Perpetrator ;
+    rdfs:range xsd:string .
+
+# ========================================
+# Datatype Properties - Publication
+# ========================================
+
+sord:publicationType a owl:DatatypeProperty ;
+    rdfs:label "publication type"@en ;
+    rdfs:domain sord:Publication ;
+    rdfs:range xsd:string .
+
+# ========================================
+# Datatype Properties - General
+# ========================================
+
+sord:organisationId a owl:DatatypeProperty ;
+    rdfs:label "organisation ID"@en ;
+    rdfs:range xsd:string .
+
+sord:inputBy a owl:DatatypeProperty ;
+    rdfs:label "input by"@en ;
+    rdfs:range xsd:string .
+
+sord:dateReportReceived a owl:DatatypeProperty ;
+    rdfs:label "date report received"@en ;
+    rdfs:range xsd:date .

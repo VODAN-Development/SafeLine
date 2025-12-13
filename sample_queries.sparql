@@ -1,0 +1,91 @@
+# ========================================
+# Query 1: Count incidents by type
+# ========================================
+PREFIX sord: <http://fieldlab2.org/ontology/sord#>
+
+SELECT ?incidentType (COUNT(?incident) AS ?count)
+WHERE {
+  ?incident a sord:SexualViolenceIncident ;
+            sord:incidentType ?incidentType .
+}
+GROUP BY ?incidentType
+ORDER BY DESC(?count)
+
+# ========================================
+# Query 2: Count incidents by location
+# ========================================
+PREFIX sord: <http://fieldlab2.org/ontology/sord#>
+
+SELECT ?location (COUNT(?incident) AS ?count)
+WHERE {
+  ?incident a sord:SexualViolenceIncident ;
+            sord:hasLocation ?loc .
+  ?loc sord:locationName ?location .
+}
+GROUP BY ?location
+ORDER BY DESC(?count)
+
+# ========================================
+# Query 3: Count victims by gender
+# ========================================
+PREFIX sord: <http://fieldlab2.org/ontology/sord#>
+
+SELECT ?gender (SUM(?numVictims) AS ?totalVictims)
+WHERE {
+  ?incident a sord:SexualViolenceIncident ;
+            sord:hasVictim ?victim .
+  ?victim sord:gender ?gender ;
+          sord:numberOfVictims ?numVictims .
+}
+GROUP BY ?gender
+ORDER BY DESC(?totalVictims)
+
+# ========================================
+# Query 4: Count incidents by perpetrator affiliation
+# ========================================
+PREFIX sord: <http://fieldlab2.org/ontology/sord#>
+
+SELECT ?affiliation (COUNT(?incident) AS ?count)
+WHERE {
+  ?incident a sord:SexualViolenceIncident ;
+            sord:hasPerpetrator ?perp .
+  ?perp sord:affiliation ?affiliation .
+}
+GROUP BY ?affiliation
+ORDER BY DESC(?count)
+
+# ========================================
+# Query 5: Incidents by year (timeline)
+# ========================================
+PREFIX sord: <http://fieldlab2.org/ontology/sord#>
+
+SELECT ?year (COUNT(?incident) AS ?count)
+WHERE {
+  ?incident a sord:SexualViolenceIncident ;
+            sord:incidentDate ?date .
+  BIND(SUBSTR(?date, 1, 4) AS ?year)
+  FILTER(REGEX(?year, "^[0-9]{4}$"))
+}
+GROUP BY ?year
+ORDER BY ?year
+
+# ========================================
+# Query 6: Get all incidents with complete information
+# ========================================
+PREFIX sord: <http://fieldlab2.org/ontology/sord#>
+PREFIX schema: <http://schema.org/>
+
+SELECT ?recordId ?date ?type ?location ?numVictims ?affiliation
+WHERE {
+  ?incident a sord:SexualViolenceIncident ;
+            sord:recordId ?recordId ;
+            sord:incidentDate ?date ;
+            sord:incidentType ?type ;
+            sord:hasLocation ?loc ;
+            sord:hasVictim ?victim ;
+            sord:hasPerpetrator ?perp .
+  ?loc sord:locationName ?location .
+  ?victim sord:numberOfVictims ?numVictims .
+  ?perp sord:affiliation ?affiliation .
+}
+LIMIT 100

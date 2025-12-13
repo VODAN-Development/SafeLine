@@ -1,0 +1,138 @@
+@prefix sord: <http://fieldlab2.org/ontology/sord#> .
+@prefix cdm: <http://example.org/hds#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+###############################################################################
+# CLASS MAPPINGS
+###############################################################################
+
+# Incidents
+sord:SexualViolenceIncident
+    rdfs:subClassOf cdm:Incident ;
+    owl:equivalentClass cdm:SexualViolenceIncident .
+
+# Location
+sord:Location
+    rdfs:subClassOf cdm:Location .
+
+# Victim
+sord:Victim
+    rdfs:subClassOf cdm:Person ;
+    owl:equivalentClass cdm:Victim .
+
+# Perpetrator
+sord:Perpetrator
+    rdfs:subClassOf cdm:Actor ;
+    owl:equivalentClass cdm:Perpetrator .
+
+# Publication / Source
+sord:Publication
+    rdfs:subClassOf cdm:SourceDocument .
+
+###############################################################################
+# OBJECT PROPERTY MAPPINGS
+###############################################################################
+
+sord:hasLocation
+    owl:equivalentProperty cdm:hasLocation .
+
+sord:hasVictim
+    owl:equivalentProperty cdm:hasVictim .
+
+sord:hasPerpetrator
+    owl:equivalentProperty cdm:hasPerpetrator .
+
+sord:hasPublication
+    owl:equivalentProperty cdm:hasSource .
+
+###############################################################################
+# DATATYPE PROPERTY MAPPINGS – INCIDENT
+###############################################################################
+
+sord:recordId
+    owl:equivalentProperty cdm:recordId .
+
+sord:recordedDate
+    owl:equivalentProperty cdm:dateRecorded .
+
+sord:incidentDate
+    owl:equivalentProperty cdm:dateOfEvent .
+
+sord:incidentType
+    owl:equivalentProperty cdm:incidentCategory .
+
+sord:violencePerpetrated
+    rdfs:subPropertyOf cdm:violenceType .
+
+sord:medicalImpact
+    rdfs:subPropertyOf cdm:impactMedical .
+
+sord:socialImpact
+    rdfs:subPropertyOf cdm:impactSocial .
+
+sord:mentalHealthImpact
+    rdfs:subPropertyOf cdm:impactPsychological .
+
+###############################################################################
+# DATATYPE PROPERTY MAPPINGS – LOCATION
+###############################################################################
+
+sord:locationName
+    owl:equivalentProperty cdm:locationName .
+
+sord:camp
+    rdfs:subPropertyOf cdm:administrativeUnit .
+
+###############################################################################
+# DATATYPE PROPERTY MAPPINGS – VICTIM
+###############################################################################
+
+sord:numberOfVictims
+    owl:equivalentProperty cdm:count .
+
+sord:age
+    owl:equivalentProperty cdm:age .
+
+sord:gender
+    owl:equivalentProperty cdm:gender .
+
+sord:ethnicity
+    rdfs:subPropertyOf cdm:ethnicity .
+
+sord:maritalStatus
+    rdfs:subPropertyOf cdm:maritalStatus .
+
+sord:parentalStatus
+    rdfs:subPropertyOf cdm:parentalStatus .
+
+###############################################################################
+# DATATYPE PROPERTY MAPPINGS – PERPETRATOR
+###############################################################################
+
+sord:numberOfPerpetrators
+    owl:equivalentProperty cdm:countPerpetrators .
+
+sord:affiliation
+    owl:equivalentProperty cdm:groupAffiliation .
+
+###############################################################################
+# DATATYPE PROPERTY MAPPINGS – PUBLICATION
+###############################################################################
+
+sord:publicationType
+    owl:equivalentProperty cdm:sourceType .
+
+###############################################################################
+# GENERAL METADATA PROPERTIES
+###############################################################################
+
+sord:organisationId
+    owl:equivalentProperty cdm:organisationId .
+
+sord:inputBy
+    owl:equivalentProperty cdm:dataCollector .
+
+sord:dateReportReceived
+    owl:equivalentProperty cdm:dateReceived .
