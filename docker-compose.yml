@@ -4,7 +4,7 @@ services:
     image: stain/jena-fuseki:latest
     container_name: fieldlab7-fuseki
     ports:
-      - "${PORT:-3030}:3030"
+      - "${PORT:-3030}:30"
     environment:
       - FUSEKI_DATASET_1=sord
       - FUSEKI_DATASET_1_RW=sord
