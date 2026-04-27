@@ -256,4 +256,4 @@ def convert_and_upload():
 # RUN
 # -------------------------------------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
